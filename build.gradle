@@ -3,7 +3,7 @@ project.group = 'de.prob'
 apply plugin: 'maven'
 
 
-def f = file('target/syncserver-0.1.0-SNAPSHOT-standalone.jar')
+def f = file('target/syncserver-0.1.0-SNAPSHOT.jar')
 
 artifacts {
     archives f
