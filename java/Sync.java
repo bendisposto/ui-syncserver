@@ -1,6 +1,7 @@
 import clojure.lang.*;
 import clojure.java.api.Clojure;
 import java.io.StringReader;
+import java.util.concurrent.Callable;
 
 public class Sync {
 
