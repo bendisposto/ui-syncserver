@@ -22,7 +22,7 @@ public class Sync {
 		jchange.invoke(value, path);
 	}
 
-    public static void modify(Callable<Object> fn, String... path) {
+    public static void modify(ISyncFunktion fn, String... path) {
 		jmodify.invoke(fn, path);
 	}
 

@@ -18,7 +18,7 @@
   (dosync (alter tx conj (fn [s] (update-in s path f)))))
 
 (defn jmodify [f path-array]
-  (modify (map keyword (into [] path-array)) f))
+  (modify (map keyword (into [] path-array)) (mk-fn f)))
 
 
 (defn delete [path]
@@ -49,10 +49,5 @@
     (send-delta old-state new-state)))
 
 
-
-
-(def boo (reify java.util.concurrent.Callable
-      (call [this] (println "boo") 42)))
-
-(defn mk-fn [^Callable c]
-  (fn [] (.call c)))
+(defn mk-fn [^ISyncFunction f]
+  (fn [x] (invoke c x)))
