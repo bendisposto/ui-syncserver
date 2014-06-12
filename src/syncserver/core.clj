@@ -2,8 +2,7 @@
   (:require [clojure.data :as d])
   (:import syncserver.ISyncFunction))
 
-(def tx (ref '()))
-(def state (ref {}))
+(def state (atom {}))
 
 (defn dissoc-in [m [k & ks :as keys]]
   (if ks
@@ -16,7 +15,7 @@
     (dissoc m k)))
 
 (defn modify [path f]
-  (dosync (alter tx conj (fn [s] (update-in s path f)))))
+  (fn [s] (update-in s path f)))
 
 (defn mk-fn [^ISyncFunction f]
   (fn [x] (.invoke f x)))
@@ -24,9 +23,12 @@
 (defn jmodify [f path-array]
   (modify (map keyword (into [] path-array)) (mk-fn f)))
 
+(defn jconj [e path-array]
+  (let [path (map keyword (into [] path-array))]
+    (modify path (fn [v] (conj v e)))))
 
 (defn delete [path]
-  (dosync (alter tx conj (fn [s] (dissoc-in s path)))))
+  (fn [s] (dissoc-in s path)))
 
 (defn jdelete [path-array]
   (delete (map keyword (into [] path-array))))
@@ -44,12 +46,12 @@
   (println "old state:" os)
   (println "new state:" ns))
 
-(defn commit []
+(defn commit [tx]
   (let [old-state @state
-        tx-function (apply comp @tx)
+        tx-function (apply comp (reverse tx))
         new-state (tx-function old-state)]
-    (dosync (ref-set state new-state)
-            (ref-set tx '()))
+    (println tx)    
+    (reset! state new-state)
     (send-delta old-state new-state)))
 
 

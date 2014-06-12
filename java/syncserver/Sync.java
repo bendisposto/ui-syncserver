@@ -6,43 +6,62 @@ import java.io.StringReader;
 import java.util.concurrent.Callable;
 
 public class Sync {
+    
+    
+    
+    private static IFn jmodify, jdelete, jchange, jcommit, conj, jconj;
+    private PersistentVector tx; 
+    
+    static {
+        IFn require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("syncserver.core"));
+        jmodify = Clojure.var("syncserver.core", "jmodify");
+        jdelete = Clojure.var("syncserver.core", "jdelete");
+        jchange = Clojure.var("syncserver.core", "jchange");
+        jconj = Clojure.var("syncserver.core", "jconj");
+        jcommit = Clojure.var("syncserver.core", "commit");
+        conj = Clojure.var("clojure.core","conj");
+    }
+    
+    public Sync() {
+        this.tx = Sync.emptyVector();
+    }
 
-	private static IFn jmodify, jdelete, jchange, jcommit;
+    public static PersistentVector emptyVector() {
+        return (PersistentVector) Clojure.read("[]");
+    }
 
-	static {
-	  IFn require = Clojure.var("clojure.core", "require");
-      require.invoke(Clojure.read("syncserver.core"));
-      jmodify = Clojure.var("syncserver.core", "jmodify");
-      jdelete = Clojure.var("syncserver.core", "jdelete");
-      jchange = Clojure.var("syncserver.core", "jchange");
-      jcommit = Clojure.var("syncserver.core", "commit");  	
-	}
+    public Sync change(Object value, String... path) {
+        this.tx = (PersistentVector) conj.invoke(this.tx, jchange.invoke(value, path));
+        return this;
+    }
+    
+    public Sync addToVector(Object value, String... path) {
+        this.tx = (PersistentVector) conj.invoke(this.tx, jconj.invoke(value, path));
+        return this;
+    }
 
-	public static void change(Object value, String... path) {
-		jchange.invoke(value, path);
-	}
-
-    public static void modify(ISyncFunction fn, String... path) {
-		jmodify.invoke(fn, path);
-	}
-
-    public static void delete(String... path) {
-		jdelete.invoke(path);
-	}
-
-	public static void commit() {
-		jcommit.invoke();
-	}
-
-
-	public static void main(String[] args) {
-		change(1,"a","a");
-		change(2,"a","b");
-		change(3,"a","c");
-		commit();
-   	    change(4,"a","d");
-   	    commit();
-	}
-
+    public Sync modify(ISyncFunction fn, String... path) {
+        this.tx = (PersistentVector) conj.invoke(this.tx, jmodify.invoke(fn, path));
+        return this;
+    }
+    
+    public Sync delete(String... path) {
+        this.tx = (PersistentVector) conj.invoke(this.tx, jdelete.invoke(path));
+        return this;
+    }
+    
+    public void commit() {
+        jcommit.invoke(this.tx);
+    }
+    
+    public static void main(String[] args) {
+        new Sync().change(Sync.emptyVector(),"foo","bar")
+        .addToVector(12,"foo","bar")
+        .addToVector(14,"foo","bar")
+        .addToVector(13,"foo","bar")
+        .commit();  
+    }
+    
 
 }
