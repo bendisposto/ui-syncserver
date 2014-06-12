@@ -7,6 +7,6 @@
   :java-source-paths ["java"]
   :aot [syncserver.core]
   :repositories [["snapshots" {:url "http://cobra.cs.uni-duesseldorf.de/artifactory/libs-snapshot-local/"
-                            :username :env
+                            :username "leiningen"
                             :passphrase :env}]]  
     )
