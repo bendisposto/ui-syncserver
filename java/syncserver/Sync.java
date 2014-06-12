@@ -1,3 +1,5 @@
+package syncserver;
+
 import clojure.lang.*;
 import clojure.java.api.Clojure;
 import java.io.StringReader;
@@ -31,5 +33,16 @@ public class Sync {
 	public static void commit() {
 		jcommit.invoke();
 	}
+
+
+	public static void main(String[] args) {
+		change(1,"a","a");
+		change(2,"a","b");
+		change(3,"a","c");
+		commit();
+   	    change(4,"a","d");
+   	    commit();
+	}
+
 
 }

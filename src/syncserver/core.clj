@@ -1,11 +1,5 @@
-(ns syncserver.core)
-
-;; Object newValue
-;; Callable c;
-;; State.change(newValue, "foo", "bar")
-;; Object v = State.get("foo","bar")
-;; State.modify(c,"foo", "bar") // applies c to the value stored @ foo;bar
-;; State.commit() // Synchronizes State with UI
+(ns syncserver.core
+  (:require [clojure.data :as d]))
 
 (def tx (ref '()))
 (def state (ref {}))
@@ -42,7 +36,7 @@
 
 
 (defn send-delta [os ns]
-  
+  (println (d/diff os ns))
   (println "old state:" os)
   (println "new state:" ns))
 
