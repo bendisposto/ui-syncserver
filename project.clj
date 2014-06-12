@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :java-source-paths ["java"]
   :aot [syncserver.core]
-  :repositories [["snapshots" {:url "http://cobra.cs.uni-duesseldorf.de/artifactory/libs-snapshot-local"
+  :repositories [["snapshots" {:url "http://cobra.cs.uni-duesseldorf.de/artifactory/"
                             :username :env/leiningen_username
                             :passphrase :env/leiningen_password}]]  
     )
