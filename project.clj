@@ -8,5 +8,5 @@
   :aot [syncserver.core]
   :repositories [["snapshots" {:url "http://cobra.cs.uni-duesseldorf.de/artifactory/libs-snapshot-local/"
                             :username "leiningen"
-                            :passphrase :env}]]  
+                            :password :env}]]  
     )
