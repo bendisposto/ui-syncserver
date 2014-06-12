@@ -1,5 +1,6 @@
 (ns syncserver.core
-  (:require [clojure.data :as d]))
+  (:require [clojure.data :as d])
+  (:import syncserver.ISyncFunction))
 
 (def tx (ref '()))
 (def state (ref {}))
@@ -16,6 +17,9 @@
 
 (defn modify [path f]
   (dosync (alter tx conj (fn [s] (update-in s path f)))))
+
+(defn mk-fn [^ISyncFunction f]
+  (fn [x] (.invoke f x)))
 
 (defn jmodify [f path-array]
   (modify (map keyword (into [] path-array)) (mk-fn f)))
@@ -49,5 +53,4 @@
     (send-delta old-state new-state)))
 
 
-(defn mk-fn [^ISyncFunction f]
-  (fn [x] (invoke c x)))
+
