@@ -2,8 +2,6 @@
   (:require [clojure.data :as d])
   (:import syncserver.ISyncFunction))
 
-(def state (atom {}))
-
 (defn dissoc-in [m [k & ks :as keys]]
   (if ks
     (if-let [nextmap (get m k)]
@@ -33,26 +31,21 @@
 (defn jdelete [path-array]
   (delete (map keyword (into [] path-array))))
 
-
 (defn change [path v]
   (modify path (constantly v)))
 
 (defn jchange [v path-array]
   (change (map keyword  (into [] path-array)) v))
 
-
-(defn send-delta [os ns]
+(defn delta [os ns]
   (println (d/diff os ns))
   (println "old state:" os)
   (println "new state:" ns))
 
-(defn commit [tx]
-  (let [old-state @state
-        tx-function (apply comp (reverse tx))
+(defn commit [old-state tx]
+  (let [tx-function (apply comp (reverse tx))
         new-state (tx-function old-state)]
-    (println tx)    
-    (reset! state new-state)
-    (send-delta old-state new-state)))
+        new-state))
 
 
 
