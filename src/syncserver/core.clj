@@ -1,6 +1,6 @@
 (ns syncserver.core
   (:require [clojure.data :as d])
-  (:import syncserver.ISyncFunction))
+  (:import syncserver.IFunction1))
 
 (defn dissoc-in [m [k & ks :as keys]]
   (if ks
