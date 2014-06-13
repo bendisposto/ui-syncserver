@@ -5,7 +5,7 @@ import clojure.java.api.Clojure;
 import java.io.StringReader;
 import java.util.concurrent.Callable;
 
-public class Sync {
+public class UITransaction {
         
     private static IFn jmodify, jdelete, jchange, jcommit, conj, jconj, delta;
 
@@ -26,47 +26,47 @@ public class Sync {
         delta = Clojure.var("syncserver.core", "delta");
     }
     
-    public Sync() {
-        this(Sync.EMPTY_MAP,Sync.EMPTY_VECTOR);
+    public UITransaction() {
+        this(UITransaction.EMPTY_MAP,UITransaction.EMPTY_VECTOR);
     }
 
 
-    public Sync(IPersistentMap state, PersistentVector tx) {
+    public UITransaction(IPersistentMap state, PersistentVector tx) {
         this.tx = tx;
         this.state = state;
     }
 
-    public Sync change(Object value, String... path) {
+    public UITransaction change(Object value, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jchange.invoke(value, path));
-        return new Sync(this.state, tx);
+        return new UITransaction(this.state, tx);
     }
     
-    public Sync addToVector(Object value, String... path) {
+    public UITransaction addToVector(Object value, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jconj.invoke(value, path));
-        return new Sync(this.state, tx);
+        return new UITransaction(this.state, tx);
     }
 
-    public Sync modify(ISyncFunction fn, String... path) {
+    public UITransaction modify(IFunction1 fn, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jmodify.invoke(fn, path));
-        return new Sync(this.state, tx);
+        return new UITransaction(this.state, tx);
     }
     
-    public Sync delete(String... path) {
+    public UITransaction delete(String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jdelete.invoke(path));
-        return new Sync(this.state, tx);
+        return new UITransaction(this.state, tx);
     }
     
-    public Sync commit() {
-        return new Sync((IPersistentMap)jcommit.invoke(this.state, this.tx), Sync.EMPTY_VECTOR);
+    public UITransaction commit() {
+        return new UITransaction((IPersistentMap)jcommit.invoke(this.state, this.tx), UITransaction.EMPTY_VECTOR);
     }
     
-    public static void delta(Sync t1, Sync t2) {
+    public static void delta(UITransaction t1, UITransaction t2) {
         delta.invoke(t1.state,t2.state); 
     }
 
     public static void main(String[] args) {
-        Sync t1 = new Sync().change(Sync.EMPTY_VECTOR,"foo","bar").commit();
-        Sync t2 = t1.addToVector(12,"foo","bar")
+        UITransaction t1 = new UITransaction().change(UITransaction.EMPTY_VECTOR,"foo","bar").commit();
+        UITransaction t2 = t1.addToVector(12,"foo","bar")
                     .addToVector(14,"foo","bar")
                     .addToVector(13,"foo","bar")
                     .commit(); 

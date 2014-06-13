@@ -1,5 +1,5 @@
 package syncserver;
 
-public interface ISyncFunction<S,T> {
+public interface IFunction1<S,T> {
 	T invoke(S v);
 }
