@@ -64,7 +64,7 @@ public class UIState {
         delta.invoke(t1.state,t2.state); 
     }
 
-    public static void delta(UIState t1) {
+    public static void delta(UIState t2) {
         delta.invoke(EMPTY_MAP,t2.state); 
     }
 
