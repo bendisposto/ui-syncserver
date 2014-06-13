@@ -15,10 +15,10 @@
 (defn modify [path f]
   (fn [s] (update-in s path f)))
 
-(defn mk-fn [^ISyncFunction f]
+(defn mk-fn [^IFunction1 f]
   (fn [x] (.invoke f x)))
 
-(defn jmodify [f path-array]
+(defn jmodify [^IFunction1 f path-array]
   (modify (map keyword (into [] path-array)) (mk-fn f)))
 
 (defn jconj [e path-array]
