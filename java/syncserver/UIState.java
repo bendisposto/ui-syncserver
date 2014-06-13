@@ -5,7 +5,7 @@ import clojure.java.api.Clojure;
 import java.io.StringReader;
 import java.util.concurrent.Callable;
 
-public class UITransaction {
+public class UIState {
         
     private static IFn jmodify, jdelete, jchange, jcommit, conj, jconj, delta;
 
@@ -26,47 +26,47 @@ public class UITransaction {
         delta = Clojure.var("syncserver.core", "delta");
     }
     
-    public UITransaction() {
-        this(UITransaction.EMPTY_MAP,UITransaction.EMPTY_VECTOR);
+    public UIState() {
+        this(UIState.EMPTY_MAP,UIState.EMPTY_VECTOR);
     }
 
 
-    public UITransaction(IPersistentMap state, PersistentVector tx) {
+    public UIState(IPersistentMap state, PersistentVector tx) {
         this.tx = tx;
         this.state = state;
     }
 
-    public UITransaction change(Object value, String... path) {
+    public UIState change(Object value, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jchange.invoke(value, path));
-        return new UITransaction(this.state, tx);
+        return new UIState(this.state, tx);
     }
     
-    public UITransaction addToVector(Object value, String... path) {
+    public UIState addToVector(Object value, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jconj.invoke(value, path));
-        return new UITransaction(this.state, tx);
+        return new UIState(this.state, tx);
     }
 
-    public UITransaction modify(IFunction1 fn, String... path) {
+    public UIState modify(IFunction1 fn, String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jmodify.invoke(fn, path));
-        return new UITransaction(this.state, tx);
+        return new UIState(this.state, tx);
     }
     
-    public UITransaction delete(String... path) {
+    public UIState delete(String... path) {
         PersistentVector tx = (PersistentVector) conj.invoke(this.tx, jdelete.invoke(path));
-        return new UITransaction(this.state, tx);
+        return new UIState(this.state, tx);
     }
     
-    public UITransaction commit() {
-        return new UITransaction((IPersistentMap)jcommit.invoke(this.state, this.tx), UITransaction.EMPTY_VECTOR);
+    public UIState commit() {
+        return new UIState((IPersistentMap)jcommit.invoke(this.state, this.tx), UIState.EMPTY_VECTOR);
     }
     
-    public static void delta(UITransaction t1, UITransaction t2) {
+    public static void delta(UIState t1, UIState t2) {
         delta.invoke(t1.state,t2.state); 
     }
 
     public static void main(String[] args) {
-        UITransaction t1 = new UITransaction().change(UITransaction.EMPTY_VECTOR,"foo","bar").commit();
-        UITransaction t2 = t1.addToVector(12,"foo","bar")
+        UIState t1 = new UIState().change(UIState.EMPTY_VECTOR,"foo","bar").commit();
+        UIState t2 = t1.addToVector(12,"foo","bar")
                     .addToVector(14,"foo","bar")
                     .addToVector(13,"foo","bar")
                     .commit(); 
