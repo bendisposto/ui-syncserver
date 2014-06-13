@@ -64,6 +64,10 @@ public class UIState {
         delta.invoke(t1.state,t2.state); 
     }
 
+    public static void delta(UIState t1) {
+        delta.invoke(EMPTY_MAP,t2.state); 
+    }
+
     public static void main(String[] args) {
         UIState t1 = new UIState().change(UIState.EMPTY_VECTOR,"foo","bar").commit();
         UIState t2 = t1.addToVector(12,"foo","bar")
