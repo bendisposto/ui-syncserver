@@ -94,7 +94,7 @@
     d3))
 
 (defn ddiff [path a b diffs]
-  (println "ddiff" a b "@" path " : " diffs)
+  #_(println "ddiff" a b "@" path " : " diffs)
   (cond
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
