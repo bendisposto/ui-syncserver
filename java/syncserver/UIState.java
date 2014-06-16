@@ -23,7 +23,7 @@ public class UIState {
     
 
     public static Object delta(Object s) {
-        delta.invoke(s); 
+        return delta.invoke(s); 
     }
 
 }
