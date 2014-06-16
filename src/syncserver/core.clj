@@ -20,8 +20,8 @@
   (swap! current-state 
     (fn [cs] 
       (let [nk (inc (:current cs))]
-      (.put cache! nk state)
-      (println "just stored" (.getIfPresent cache! nk))
+      (.put cache! (str nk) state)
+      (println "just stored" (.getIfPresent cache! (str nk)))
       (assoc cs :state state :current nk)))))
 
 (defn arg-count [f]
