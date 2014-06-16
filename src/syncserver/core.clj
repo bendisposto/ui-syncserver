@@ -48,7 +48,7 @@
 (def b (transact a [[[:a :c] -1] [[:d :e] (fn [v] (assoc v 1 10))]]))
 
 (defn vector-diff-same-length [path a b diffs]
-  (println "vector-diff-same-length" a b "@" path " : " diffs)
+  #_(println "vector-diff-same-length" a b "@" path " : " diffs)
   (reduce (fn [d index]
             (let [itm (get b index)
                   oitem (get a index)]
@@ -56,20 +56,20 @@
               (ddiff (conj path index) oitem itm d))) diffs (range 0 (count b))))
 
 (defn vector-diff [path a b diff]
-  (println "vector-diff" a b "@" path " : " diff)
-  (if (identical? a b)
+  #_(println "vector-diff" a b "@" path " : " diff)
+  (if (= a b)
     diff
     (let [[diffing rest] (split-at (count a) b)
-          diff' (vector-diff-same-length path a (into [] diffing) diff)
-          diff'' (if (seq rest) (conj diff' [:concat path (into [] rest)]) diff')]
-      (if (< (count b) (count a)) (conj diff'' [:del path (into [] (range (count b) (count a)))])  diff''))))
+          d1 (vector-diff-same-length path a (into [] diffing) diff)
+          d2 (if (seq rest) (conj d1 [:concat path (into [] rest)]) d1)]
+      (if (< (count b) (count a)) (conj d2 [:del path (into [] (range (count b) (count a)))])  d2))))
 
 (defn map-diff-proc [path a b diffs]
   (reduce (fn [d ky]
             (ddiff (conj path ky) (get a ky) (get b ky) d)) diffs (keys b)))
 
 (defn map-diff [path a b diffs]
-  (println "map-diff" a b "@" path " : " diffs)
+  #_(println "map-diff" a b "@" path " : " diffs)
   (let [a-keys (into #{} (keys a))
         b-keys (into #{} (keys b))
         del-keys (s/difference a-keys b-keys)
@@ -84,13 +84,9 @@
 (defn ddiff [path a b diffs]
   (println "ddiff" a b "@" path " : " diffs)
   (cond
-   (identical? a b) diffs
-   (vector? b) (if (vector? a)
-                 (vector-diff path a b diffs)
-                 (conj diffs [:set path b]))
-   (map? b) (if (map? a)
-              (map-diff path a b diffs)
-              (conj diffs [:set path b]))
+   (= a b) diffs
+   (every? vector? [a b]) (vector-diff path a b diffs)
+   (every? map? [a b]) (map-diff path a b diffs)
    :otherwise (if (= a b) diffs (conj diffs [:set path b]))))
 
 (comment

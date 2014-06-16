@@ -10,5 +10,6 @@
   :main syncserver.core
   :repositories [["snapshots" {:url "http://cobra.cs.uni-duesseldorf.de/artifactory/libs-snapshot-local/"
                             :username "leiningen"
-                            :password :env}]]  
-    )
+                               :password :env}]]
+  :profiles {:dev {:dependencies [[midje "1.5.1"]]}}
+  )
