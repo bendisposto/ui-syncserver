@@ -10,7 +10,7 @@
 
 (declare ddiff)
 
-(def cache! (.. CacheBuilder (newBuilder) (expireAfterWrite 5 TimeUnit/SECONDS) (build)))
+(def cache! (.. (CacheBuilder/newBuilder) (expireAfterWrite 5 TimeUnit/SECONDS) (build)))
 
 (def current-state 
   (atom {:state nil 
