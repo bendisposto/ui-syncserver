@@ -31,8 +31,8 @@
 (defn delta [old-state]
   (if old-state
    (let [os (.getIfPresent cache! old-state)]
-      (ddiff [] os @current-state #{}))
-   (ddiff [] nil @current-state #{})))
+      (ddiff [] os (:state @current-state) #{}))
+   (ddiff [] nil (:state @current-state) #{})))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
