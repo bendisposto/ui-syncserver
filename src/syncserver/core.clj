@@ -13,9 +13,9 @@
     (alength p)))
 
 (defn delta [old-state]
-  (println (d/diff old-state @current-state))
   (println "old state:" old-state)
-  (println "new state:" @current-state))
+  (println "new state:" @current-state)
+  (d/diff old-state @current-state))
 
 (defn groovy [s x cls]
       (case (.getMaximumNumberOfParameters cls)
