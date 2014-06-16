@@ -31,6 +31,7 @@
 (defn delta [old-state]
   (if old-state
    (let [os (.getIfPresent cache! old-state)]
+      (println "exists!")
       (ddiff [] os (:state @current-state) #{}))
    (ddiff [] nil (:state @current-state) #{})))
 
@@ -58,7 +59,7 @@
 
 
 (defn vector-diff-same-length [path a b diffs]
-  #_(println "vector-diff-same-length" a b "@" path " : " diffs)
+  (println "vector-diff-same-length" a b "@" path " : " diffs)
   (reduce (fn [d index]
             (let [itm (get b index)
                   oitem (get a index)]
@@ -66,7 +67,7 @@
               (ddiff (conj path index) oitem itm d))) diffs (range 0 (count b))))
 
 (defn vector-diff [path a b diff]
-  #_(println "vector-diff" a b "@" path " : " diff)
+  (println "vector-diff" a b "@" path " : " diff)
   (if (= a b)
     diff
     (let [[diffing rest] (split-at (count a) b)
@@ -79,7 +80,7 @@
             (ddiff (conj path ky) (get a ky) (get b ky) d)) diffs (keys b)))
 
 (defn map-diff [path a b diffs]
-  #_(println "map-diff" a b "@" path " : " diffs)
+  (println "map-diff" a b "@" path " : " diffs)
   (let [a-keys (into #{} (keys a))
         b-keys (into #{} (keys b))
         del-keys (s/difference a-keys b-keys)
@@ -92,7 +93,7 @@
     d3))
 
 (defn ddiff [path a b diffs]
-  #_(println "ddiff" a b "@" path " : " diffs)
+  (println "ddiff" a b "@" path " : " diffs)
   (cond
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
