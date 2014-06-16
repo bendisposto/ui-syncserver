@@ -17,8 +17,8 @@ public class UIState {
         delta = Clojure.var("syncserver.core", "delta");
     }
     
-    public static Object transact(Object state, List tx) {
-        return transact.invoke(state, tx);
+    public static Object transact(List tx) {
+        return transact.invoke(tx);
     }
     
 

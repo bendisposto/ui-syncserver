@@ -50,12 +50,10 @@
        (and (fn? e) (= 2 (arg-count e))) (update-in s p (partial e s))
        :else (update-in s p (constantly e))))))
 
-(defn transact [state txs]
+(defn transact [txs]
   (let [transfunc (->> txs (map transform) reverse (apply comp))
-        new-state (transfunc state)]
-    (store! new-state)
-    new-state
-    ))
+        new-state (transfunc (:state @current-state))]
+    (store! new-state)))
 
 
 
