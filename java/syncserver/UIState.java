@@ -21,12 +21,9 @@ public class UIState {
         return transact.invoke(state, tx);
     }
     
-    public static void delta(Object t1, Object t2) {
-        delta.invoke(t1,t2); 
-    }
 
-    public static void delta(Object t2) {
-        delta.invoke(new HashMap(),t2); 
+    public static void delta(Object s) {
+        delta.invoke(s); 
     }
 
 }
