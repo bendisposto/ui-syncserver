@@ -1,7 +1,6 @@
 (ns syncserver.core
   (:gen-class)
-  (:require [clojure.data :as d]
-            [clojure.set :as s])
+  (:require [clojure.set :as s])
 
   (:import syncserver.IFunction1
            syncserver.IFunction2
@@ -15,9 +14,7 @@
     (alength p)))
 
 (defn delta [old-state]
-  (println "old state:" old-state)
-  (println "new state:" @current-state)
-  (d/diff old-state @current-state))
+   (ddiff [] old-state @current-state #{}))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
@@ -43,9 +40,6 @@
     ))
 
 (declare ddiff)
-
-(def a {:a {:b 1 :c 3} :c [17 19] :d {:e [1 2 3] :f 5}})
-(def b (transact a [[[:a :c] -1] [[:d :e] (fn [v] (assoc v 1 10))]]))
 
 (defn vector-diff-same-length [path a b diffs]
   #_(println "vector-diff-same-length" a b "@" path " : " diffs)
