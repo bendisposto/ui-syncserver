@@ -4,9 +4,24 @@
 
   (:import syncserver.IFunction1
            syncserver.IFunction2
-           groovy.lang.Closure))
+           groovy.lang.Closure
+           com.google.common.cache.CacheBuilder
+           java.util.concurrent.TimeUnit))
 
-(def current-state (atom {}))
+(declare ddiff)
+
+(def cache! (.. CacheBuilder (newBuilder) (expireAfterWrite 5 TimeUnit/SECONDS) (build)))
+
+(def current-state 
+  (atom {:state nil 
+         :current 0}))
+
+(defn store! [state]
+  (swap! current-state 
+    (fn [cs] 
+      (let [nk (inc (:current cs))]
+          (.put cache! nk state)
+      (assoc cs :state state :current nk)))))
 
 (defn arg-count [f]
   (let [m (first (.getDeclaredMethods (class f)))
@@ -14,7 +29,8 @@
     (alength p)))
 
 (defn delta [old-state]
-   (ddiff [] old-state @current-state #{}))
+   (let [os (.getIfPresent cache! old-state)]
+      (ddiff [] os @current-state #{})))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
@@ -35,11 +51,11 @@
 (defn transact [state txs]
   (let [transfunc (->> txs (map transform) reverse (apply comp))
         new-state (transfunc state)]
-    (reset! current-state new-state)
+    (store! new-state)
     new-state
     ))
 
-(declare ddiff)
+
 
 (defn vector-diff-same-length [path a b diffs]
   #_(println "vector-diff-same-length" a b "@" path " : " diffs)

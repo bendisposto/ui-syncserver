@@ -4,7 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                   [org.codehaus.groovy/groovy-all "2.3.0"]]
+                 [org.codehaus.groovy/groovy-all "2.3.0"]
+                 [com.google.guava/guava "14.0.1"]]
   :java-source-paths ["java"]
   :aot [syncserver.core]
   :main syncserver.core
