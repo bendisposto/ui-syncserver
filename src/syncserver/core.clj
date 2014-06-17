@@ -8,21 +8,30 @@
            com.google.common.cache.CacheBuilder
            java.util.concurrent.TimeUnit))
 
+(def debug-mode (atom nil))
+
+(defn set-debug [x]
+  (reset! debug-mode x))
+
 (declare ddiff)
+
+(defmacro debug [& text]
+  `(when @debug-mode (println ~@text)))
+
 
 (def cache! (.. (CacheBuilder/newBuilder) (expireAfterWrite 5 TimeUnit/SECONDS) (build)))
 
-(def current-state 
-  (atom {:state nil 
+(def current-state
+  (atom {:state nil
          :current 0}))
 
 (defn store! [state]
-  (swap! current-state 
-    (fn [cs] 
-      (let [nk (inc (:current cs))]
-      (.put cache! (str nk) state)
-      (println "just stored" (.getIfPresent cache! (str nk)))
-      (assoc cs :state state :current nk)))))
+  (swap! current-state
+         (fn [cs]
+           (let [nk (inc (:current cs))]
+             (.put cache! (str nk) state)
+             (debug "Cached" (.getIfPresent cache! (str nk)) "at" (str nk))
+             (assoc cs :state state :current nk)))))
 
 (defn arg-count [f]
   (let [m (first (.getDeclaredMethods (class f)))
@@ -31,10 +40,10 @@
 
 (defn delta [old-state]
   (if old-state
-   (let [os (.getIfPresent cache! old-state)]
-      (println "exists!")
+    (let [os (.getIfPresent cache! old-state)]
+      (when os (debug "Cache hit:" os))
       (ddiff [] os (:state @current-state) #{}))
-   (ddiff [] nil (:state @current-state) #{})))
+    (ddiff [] nil (:state @current-state) #{})))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
@@ -57,10 +66,8 @@
         new-state (transfunc (:state @current-state))]
     (store! new-state)))
 
-
-
 (defn vector-diff-same-length [path a b diffs]
-  (println "vector-diff-same-length" a b "@" path " : " diffs)
+  (debug "vector-diff-same-length" a b "@" path " : " diffs)
   (reduce (fn [d index]
             (let [itm (get b index)
                   oitem (get a index)]
@@ -68,7 +75,7 @@
               (ddiff (conj path index) oitem itm d))) diffs (range 0 (count b))))
 
 (defn vector-diff [path a b diff]
-  (println "vector-diff" a b "@" path " : " diff)
+  (debug "vector-diff" a b "@" path " : " diff)
   (if (= a b)
     diff
     (let [[diffing rest] (split-at (count a) b)
@@ -81,7 +88,7 @@
             (ddiff (conj path ky) (get a ky) (get b ky) d)) diffs (keys b)))
 
 (defn map-diff [path a b diffs]
-  (println "map-diff" a b "@" path " : " diffs)
+  (debug "map-diff" a b "@" path " : " diffs)
   (let [a-keys (into #{} (keys a))
         b-keys (into #{} (keys b))
         del-keys (s/difference a-keys b-keys)
@@ -94,7 +101,7 @@
     d3))
 
 (defn ddiff [path a b diffs]
-  (println "ddiff" a b "@" path " : " diffs)
+  (debug "ddiff" a b "@" path " : " diffs)
   (cond
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
