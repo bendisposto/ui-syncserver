@@ -22,8 +22,8 @@ public class UIState {
     }
     
 
-    public static Object delta(Object s) {
-        return delta.invoke(s); 
+    public static Object[] delta(Object s) {
+        return (Object[]) delta.invoke(s); 
     }
 
 }

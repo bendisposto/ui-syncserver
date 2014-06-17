@@ -39,11 +39,12 @@
     (alength p)))
 
 (defn delta [old-state]
+  (let [cs @current-state]
   (if old-state
     (let [os (.getIfPresent cache! old-state)]
       (when os (debug "Cache hit:" os))
-      (ddiff [] os (:state @current-state) #{}))
-    (ddiff [] nil (:state @current-state) #{})))
+      (object-array [(:current cs) (ddiff [] os (:state cs) #{})]))
+    (object-array [(:current cs) (ddiff [] nil (:state cs) #{})]))))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
