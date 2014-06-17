@@ -41,7 +41,7 @@
 (defn delta [old-state]
   (let [cs @current-state]
   (if (= old-state (str (:current cs)))
-   #{}
+   (object-array [(:current cs) #{}])
   (if old-state
     (let [os (.getIfPresent cache! old-state)]
       (when os (debug "Cache hit:" os))
