@@ -19,7 +19,7 @@
   `(when @debug-mode (println ~@text)))
 
 
-(def cache! (.. (CacheBuilder/newBuilder) (expireAfterRead 5 TimeUnit/SECONDS) (build)))
+(def cache! (.. (CacheBuilder/newBuilder) (expireAfterAccess 5 TimeUnit/SECONDS) (build)))
 
 (def current-state
   (atom {:state nil
