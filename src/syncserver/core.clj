@@ -43,8 +43,8 @@
   (if old-state
     (let [os (.getIfPresent cache! old-state)]
       (when os (debug "Cache hit:" os))
-      (object-array [(:current cs) (ddiff [] os (:state cs) #{})]))
-    (object-array [(:current cs) (ddiff [] nil (:state cs) #{})]))))
+      (object-array [(:current cs) (map-diff [] os (:state cs) #{})]))
+    (object-array [(:current cs) (map-diff [] nil (:state cs) #{})]))))
 
 (defn groovy [s x cls]
   (case (.getMaximumNumberOfParameters cls)
@@ -107,7 +107,7 @@
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
    (every? map? [a b]) (map-diff path a b diffs)
-   :otherwise (if (= a b) diffs (conj diffs [:set path b]))))
+   :otherwise (conj diffs [:set path b])))
 
 (comment
   (defn -main [& args]
