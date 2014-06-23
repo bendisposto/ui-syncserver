@@ -49,11 +49,10 @@
   (let [t (type e)]
     (fn [s]
       (cond
-       (contains? (supers t) groovy.lang.Closure)
-       (update-in s p #(groovy s % e))
+       (contains? (supers t) groovy.lang.Closure) (update-in s p (fn [c] (immutable (groovy s c e))))
        (and (fn? e) (= 1 (arg-count e))) (update-in s p e)
        (and (fn? e) (= 2 (arg-count e))) (update-in s p (partial e s))
-       :else (update-in s p (constantly e))))))
+       :else (update-in s p (constantly (immutable e)))))))
 
 (defn transact [txs]
   (let [transfunc (->> txs (map transform) reverse (apply comp))
@@ -113,7 +112,7 @@
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
    (every? map? [a b]) (map-diff path a b diffs)
-   :otherwise (conj diffs [:set path (immutable b)])))
+   :otherwise (conj diffs [:set path b])))
 
 
 (defn- compute-delta [os cs]
