@@ -45,6 +45,19 @@
     1 (.call cls x)
     2 (.call cls [x s])))
 
+(defn- primitive-array? [o]
+  (.isArray (class o)))
+
+
+(defn- immutable [b]
+  (cond
+   (or (instance? java.util.Map b)
+       (map? b)) (into {} b)
+   (or  (instance? java.util.List b)
+        (primitive-array? b)
+        (coll? b)) (into [] b)
+   :otherwise b))
+
 (defn transform [[p e]]
   (let [t (type e)]
     (fn [s]
@@ -93,17 +106,6 @@
         d3 (if (seq new-in-b) (conj d2 [:merge path new-in-b]) d2)]
     d3))
 
-(defn- primitive-array? [o]
-  (.isArray (class o)))
-
-(defn immutable [b]
-  (cond
-   (or (instance? java.util.Map b)
-       (map? b)) (into {} b)
-   (or  (instance? java.util.List b)
-        (primitive-array? b)
-        (coll? b)) (into [] b)
-   :otherwise b))
 
 
 (defn ddiff [path a b diffs]
