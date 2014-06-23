@@ -103,14 +103,15 @@
    (every? map? [a b]) (map-diff path a b diffs)
    :otherwise (conj diffs [:set path b])))
 
-(defn delta [old-state]
-  (let [cs @current-state]
-  (if old-state
-    (let [os (.getIfPresent cache! old-state)]
-      (when os (debug "Cache hit:" os))
-      (object-array [(:current cs) (map-diff [] os (:state cs) #{})]))
-    (object-array [(:current cs) (map-diff [] nil (:state cs) #{})]))))
 
+(defn- compute-delta [os cs]
+  (object-array [(:current cs) (map-diff [] (:state os) (:state cs) #{})]))
+
+(defn- get-from-cache [old-state]
+  (when old-state (.getIfPresent cache! old-state)))
+
+(defn delta [old-state]
+  (compute-delta (get-from-cache old-state) @current-state))
 
 (comment
   (defn -main [& args]
