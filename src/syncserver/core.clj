@@ -50,6 +50,7 @@
 
 
 (defn- immutable [b]
+  (debug "called immutable on" b)
   (cond
    (or (instance? java.util.Map b)
        (map? b)) (into {} b)
@@ -59,6 +60,7 @@
    :otherwise b))
 
 (defn transform [[p e]]
+  (debug "transforming" e "@" p)
   (let [t (type e)]
     (fn [s]
       (cond
