@@ -94,13 +94,24 @@
         d3 (if (seq new-in-b) (conj d2 [:merge path new-in-b]) d2)]
     d3))
 
+(defn- primitive-array? [o]
+  (.isArray (class o)))
+
+(defn immutable [b]
+  (cond
+   (map? b) (into {} b)
+   (or  (seq? b)
+        (primitive-array? b)) (into [] b)
+   :otherwise b))
+
+
 (defn ddiff [path a b diffs]
   (debug "ddiff" a b "@" path " : " diffs)
   (cond
    (= a b) diffs
    (every? vector? [a b]) (vector-diff path a b diffs)
    (every? map? [a b]) (map-diff path a b diffs)
-   :otherwise (conj diffs [:set path b])))
+   :otherwise (conj diffs [:set path (immutable b)])))
 
 
 (defn- compute-delta [os cs]
