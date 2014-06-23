@@ -18,7 +18,6 @@
 (defmacro debug [& text]
   `(when @debug-mode (println ~@text)))
 
-
 (def cache! (.. (CacheBuilder/newBuilder) (expireAfterAccess 500 TimeUnit/SECONDS) (build)))
 
 (def current-state
@@ -29,7 +28,7 @@
   (swap! current-state
          (fn [cs]
            (let [nk (inc (:current cs))]
-             (.put cache! (str nk) state)
+             (.put cache! (str nk) {:state state :current nk})
              (debug "Cached" (.getIfPresent cache! (str nk)) "at" (str nk))
              (assoc cs :state state :current nk)))))
 
@@ -105,6 +104,7 @@
 
 
 (defn- compute-delta [os cs]
+  (debug os cs)
   (object-array [(:current cs) (map-diff [] (:state os) (:state cs) #{})]))
 
 (defn- get-from-cache [old-state]
