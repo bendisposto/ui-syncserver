@@ -99,9 +99,11 @@
 
 (defn immutable [b]
   (cond
-   (map? b) (into {} b)
-   (or  (seq? b)
-        (primitive-array? b)) (into [] b)
+   (or (instance? java.util.Map b)
+       (map? b)) (into {} b)
+   (or  (instance? java.util.List b)
+        (primitive-array? b)
+        (coll? b)) (into [] b)
    :otherwise b))
 
 
