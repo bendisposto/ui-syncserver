@@ -1,4 +1,4 @@
-package syncserver;
+package de.prob.sync;
 
 import clojure.lang.*;
 import clojure.java.api.Clojure;

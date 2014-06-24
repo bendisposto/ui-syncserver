@@ -2,9 +2,7 @@
   (:gen-class)
   (:require [clojure.set :as s])
 
-  (:import syncserver.IFunction1
-           syncserver.IFunction2
-           groovy.lang.Closure
+  (:import groovy.lang.Closure
            com.google.common.cache.CacheBuilder
            java.util.concurrent.TimeUnit))
 
