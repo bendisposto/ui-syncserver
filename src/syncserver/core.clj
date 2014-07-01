@@ -35,14 +35,6 @@
         p (.getParameterTypes m)]
     (alength p)))
 
-
-
-(defn groovy [s x cls]
-  (case (.getMaximumNumberOfParameters cls)
-    0 (.call cls)
-    1 (.call cls x)
-    2 (.call cls [x s])))
-
 (defn- primitive-array? [o]
   (.isArray (class o)))
 
@@ -57,9 +49,30 @@
         (coll? b)) (into [] b)
    :otherwise b))
 
+(defn- mutable [b]
+  (debug "called mutable on" b)
+  (cond
+   (or (instance? java.util.Map b)
+       (map? b)) (doto (java.util.HashMap.) (.putAll b))
+   (or  (instance? java.util.List b)
+        (primitive-array? b)
+        (coll? b)) (doto (java.util.ArrayList.) (.addAll b))
+   :otherwise b))
+
+(defn groovy [s x cls]
+  (debug "Groovy Closure with" (.getMaximumNumberOfParameters cls) "parameters")
+  (let [mx (mutable x)]
+  (case (.getMaximumNumberOfParameters cls)
+    0 (.call cls)
+    1 (.call cls mx)
+    2 (.call cls [mx s]))))
+
+
+
 (defn transform [[p e]]
   (debug "transforming" e "@" p)
   (let [t (type e)]
+    (debug "type" t "closure?" (contains? (supers t) groovy.lang.Closure))
     (fn [s]
       (cond
        (contains? (supers t) groovy.lang.Closure) (update-in s p (fn [c] (immutable (groovy s c e))))
@@ -119,7 +132,7 @@
 
 (defn- compute-delta [os cs]
   (debug os cs)
-  (object-array [(:current cs) (map-diff [] (:state os) (:state cs) #{})]))
+  (pr-str [(:current cs) (map-diff [] (:state os) (:state cs) #{})]))
 
 (defn- get-from-cache [old-state]
   (when old-state (.getIfPresent cache! old-state)))

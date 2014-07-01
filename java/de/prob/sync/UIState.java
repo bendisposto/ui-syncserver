@@ -23,8 +23,8 @@ public class UIState {
     }
     
 
-    public static Object[] delta(Object s) {
-        return (Object[]) delta.invoke(s); 
+    public static String delta(Object s) {
+        return (String) delta.invoke(s); 
     }
 
     public static void setDebug(Object x) {
